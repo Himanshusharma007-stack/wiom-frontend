@@ -27,14 +27,14 @@ const TaskForm = ({ task, onTaskUpdated }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
-          value={title}
+          value={task?.title || title}
           onChange={(e) => setTitle(e.target.value)}
           className="border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:border-blue-500 p-2 rounded w-full text-gray-700"
           placeholder="Task Title"
           required
         />
         <textarea
-          value={description}
+          value={task?.description || description}
           onChange={(e) => setDescription(e.target.value)}
           className="border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:border-blue-500 p-2 rounded w-full text-gray-700"
           placeholder="Task Description"
