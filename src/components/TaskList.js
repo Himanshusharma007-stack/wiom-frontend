@@ -1,72 +1,71 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const TaskList = ({ tasks, onEdit, refreshTasks }) => {
-  const [filteredStatus, setFilteredStatus] = useState("all");
-
   useEffect(() => {
-    refreshTasks();
+    refreshTasks(); // Fetch tasks when component mounts
   }, []);
+
+  const handleToggleComplete = async (taskId, subtaskId = null) => {
+    try {
+      const url = subtaskId
+        ? `http://localhost:3300/api/tasks/${taskId}/subtasks/${subtaskId}/toggle`
+        : `http://localhost:3300/api/tasks/${taskId}/toggle`;
+
+      await axios.patch(url);
+      refreshTasks(); // Refresh tasks after toggling
+    } catch (error) {
+      console.error("Error updating task/subtask status:", error);
+    }
+  };
 
   const handleDelete = async (taskId) => {
     try {
       await axios.delete(`http://localhost:3300/api/tasks/${taskId}`);
-      refreshTasks();
+      refreshTasks(); // Refresh the task list after deleting
     } catch (error) {
       console.error("Error deleting task:", error);
     }
   };
-
-  const filteredTasks = tasks.filter((task) => {
-    if (filteredStatus === "all") return true;
-    return task.status === filteredStatus;
-  });
+  
 
   return (
     <div className="p-4">
-      {/* Filter Dropdown */}
-      <div className="mb-4">
-        <label className="text-gray-700 font-semibold mr-2">Filter by Status:</label>
-        <select
-          value={filteredStatus}
-          onChange={(e) => setFilteredStatus(e.target.value)}
-          className="border border-gray-300 p-2 rounded"
-        >
-          <option value="all">All</option>
-          <option value="pending">Pending</option>
-          <option value="in-progress">In Progress</option>
-          <option value="completed">Completed</option>
-        </select>
-      </div>
-
-      {filteredTasks.length === 0 ? (
+      {tasks.length === 0 ? (
         <p className="text-gray-500">No tasks available.</p>
       ) : (
-        filteredTasks.map((task) => (
-          <div key={task._id} className="p-4 border rounded-lg shadow-md mb-2 bg-white">
-            <h3 className="font-bold text-lg text-gray-800">{task.title}</h3>
+        tasks.map((task) => (
+          <div key={task._id} className="p-4 border rounded-lg shadow-md mb-4 bg-white">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={task.completed}
+                onChange={() => handleToggleComplete(task._id)}
+                className="mr-2"
+              />
+              <h3 className={`font-bold text-lg ${task.completed ? "line-through text-gray-400" : "text-gray-800"}`}>
+                {task.title}
+              </h3>
+            </div>
             <p className="text-gray-600">{task.description}</p>
 
-            {/* Task Status */}
-            <span className={`inline-block px-3 py-1 mt-2 text-sm font-semibold rounded ${
-              task.status === "completed" ? "bg-green-500 text-white"
-                : task.status === "in-progress" ? "bg-yellow-500 text-white"
-                : "bg-gray-400 text-white"
-            }`}>
-              {task.status}
-            </span>
-
-            {/* Display Subtasks */}
+            {/* Subtasks */}
             {task.subtasks.length > 0 && (
-              <div className="mt-3 bg-gray-100 p-2 rounded">
-                <h4 className="text-gray-700 font-semibold">Subtasks:</h4>
-                <ul className="list-disc pl-5 text-gray-600">
-                  {task.subtasks.map((subtask, index) => (
-                    <li key={index} className={subtask.completed ? "line-through" : ""}>
+              <div className="mt-3 ml-5">
+                <h4 className="font-semibold">Subtasks:</h4>
+                {task.subtasks.map((subtask) => (
+                  <div key={subtask._id} className="flex items-center mt-1">
+                    <input
+                      type="checkbox"
+                      checked={subtask.completed}
+                      onChange={() => handleToggleComplete(task._id, subtask._id)}
+                      className="mr-2"
+                    />
+                    <span className={subtask.completed ? "line-through text-gray-400" : "text-gray-800"}>
                       {subtask.title}
-                    </li>
-                  ))}
-                </ul>
+                    </span>
+                  </div>
+                ))}
               </div>
             )}
 
