@@ -4,18 +4,20 @@ import axios from "axios";
 const TaskForm = ({ task, onTaskUpdated }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState(""); // New state for status
+  const [subtasks, setSubtasks] = useState([]); // Subtasks array
+  const [newSubtask, setNewSubtask] = useState(""); // Input for new subtask
 
   // Sync state when task changes
   useEffect(() => {
     setTitle(task?.title || "");
     setDescription(task?.description || "");
-    setStatus(task?.status || "pending"); // Default to "pending" if not provided
+    setSubtasks(task?.subtasks || []);
   }, [task]);
 
+  // Handle task form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newTask = { title, description, status: status.toLowerCase() }; // Include status
+    const newTask = { title, description, subtasks };
 
     try {
       if (task) {
@@ -27,6 +29,19 @@ const TaskForm = ({ task, onTaskUpdated }) => {
     } catch (error) {
       console.error("Error submitting task:", error);
     }
+  };
+
+  // Add a new subtask
+  const addSubtask = () => {
+    if (newSubtask.trim() !== "") {
+      setSubtasks([...subtasks, { title: newSubtask, completed: false }]);
+      setNewSubtask(""); // Clear input
+    }
+  };
+
+  // Remove a subtask
+  const removeSubtask = (index) => {
+    setSubtasks(subtasks.filter((_, i) => i !== index));
   };
 
   return (
@@ -50,18 +65,41 @@ const TaskForm = ({ task, onTaskUpdated }) => {
           placeholder="Task Description"
           rows="3"
         ></textarea>
-        
-        {/* Status Dropdown */}
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:border-blue-500 p-2 rounded w-full text-gray-700"
-          required
-        >
-          <option value="pending">pending</option>
-          <option value="in-progress">In Progress</option>
-          <option value="completed">Completed</option>
-        </select>
+
+        {/* Subtasks Input */}
+        <div className="mt-4">
+          <h3 className="text-gray-700 font-semibold mb-2">Subtasks</h3>
+          <div className="flex space-x-2 mb-2">
+            <input
+              type="text"
+              value={newSubtask}
+              onChange={(e) => setNewSubtask(e.target.value)}
+              className="border border-gray-300 p-2 rounded w-full"
+              placeholder="Enter subtask"
+            />
+            <button
+              type="button"
+              onClick={addSubtask}
+              className="bg-green-500 text-white px-4 py-2 rounded"
+            >
+              Add
+            </button>
+          </div>
+
+          {/* Subtasks List */}
+          {subtasks.map((subtask, index) => (
+            <div key={index} className="flex justify-between items-center bg-gray-100 p-2 rounded mb-2">
+              <span>{subtask.title}</span>
+              <button
+                type="button"
+                onClick={() => removeSubtask(index)}
+                className="text-red-500"
+              >
+                ✖
+              </button>
+            </div>
+          ))}
+        </div>
 
         <button
           type="submit"
