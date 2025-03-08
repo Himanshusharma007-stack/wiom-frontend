@@ -4,16 +4,18 @@ import axios from "axios";
 const TaskForm = ({ task, onTaskUpdated }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [status, setStatus] = useState(""); // New state for status
 
   // Sync state when task changes
   useEffect(() => {
     setTitle(task?.title || "");
     setDescription(task?.description || "");
+    setStatus(task?.status || "pending"); // Default to "pending" if not provided
   }, [task]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newTask = { title, description };
+    const newTask = { title, description, status }; // Include status
 
     try {
       if (task) {
@@ -48,6 +50,19 @@ const TaskForm = ({ task, onTaskUpdated }) => {
           placeholder="Task Description"
           rows="3"
         ></textarea>
+        
+        {/* Status Dropdown */}
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:border-blue-500 p-2 rounded w-full text-gray-700"
+          required
+        >
+          <option value="pending">Pending</option>
+          <option value="in-progress">In Progress</option>
+          <option value="completed">Completed</option>
+        </select>
+
         <button
           type="submit"
           className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded transition duration-300"

@@ -17,14 +17,44 @@ const TaskList = ({ tasks, onEdit, refreshTasks }) => {
 
   return (
     <div className="p-4">
-      {tasks.map((task) => (
-        <div key={task._id} className="p-3 border rounded mb-2">
-          <h3 className="font-bold">{task.title}</h3>
-          <p>{task.description}</p>
-          <button onClick={() => onEdit(task)} className="text-blue-500">Edit</button>
-          <button onClick={() => handleDelete(task._id)} className="text-red-500 ml-2">Delete</button>
-        </div>
-      ))}
+      {tasks.length === 0 ? (
+        <p className="text-gray-500">No tasks available.</p>
+      ) : (
+        tasks.map((task) => (
+          <div key={task._id} className="p-4 border rounded-lg shadow-md mb-2 bg-white">
+            <h3 className="font-bold text-lg text-gray-800">{task.title}</h3>
+            <p className="text-gray-600">{task.description}</p>
+            
+            {/* Display Task Status */}
+            <span
+              className={`inline-block px-3 py-1 mt-2 text-sm font-semibold rounded ${
+                task.status === "completed"
+                  ? "bg-green-500 text-white"
+                  : task.status === "in-progress"
+                  ? "bg-yellow-500 text-white"
+                  : "bg-gray-400 text-white"
+              }`}
+            >
+              {task.status}
+            </span>
+
+            <div className="mt-3">
+              <button
+                onClick={() => onEdit(task)}
+                className="text-blue-500 hover:underline mr-4"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDelete(task._id)}
+                className="text-red-500 hover:underline"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))
+      )}
     </div>
   );
 };
