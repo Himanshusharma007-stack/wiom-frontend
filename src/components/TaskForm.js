@@ -15,7 +15,7 @@ const TaskForm = ({ task, onTaskUpdated }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newTask = { title, description, status }; // Include status
+    const newTask = { title, description, status: status.toLowerCase() }; // Include status
 
     try {
       if (task) {
@@ -58,7 +58,7 @@ const TaskForm = ({ task, onTaskUpdated }) => {
           className="border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:border-blue-500 p-2 rounded w-full text-gray-700"
           required
         >
-          <option value="pending">Pending</option>
+          <option value="pending">pending</option>
           <option value="in-progress">In Progress</option>
           <option value="completed">Completed</option>
         </select>
