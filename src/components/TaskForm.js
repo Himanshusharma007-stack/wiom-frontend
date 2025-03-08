@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const TaskForm = ({ task, onTaskUpdated }) => {
-  const [title, setTitle] = useState(task?.title || "");
-  const [description, setDescription] = useState(task?.description || "");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  // Sync state when task changes
+  useEffect(() => {
+    setTitle(task?.title || "");
+    setDescription(task?.description || "");
+  }, [task]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,18 +29,20 @@ const TaskForm = ({ task, onTaskUpdated }) => {
 
   return (
     <div className="max-w-lg mx-auto bg-white shadow-md rounded-lg p-6">
-      <h2 className="text-xl font-semibold text-gray-700 mb-4">{task ? "Edit Task" : "Create Task"}</h2>
+      <h2 className="text-xl font-semibold text-gray-700 mb-4">
+        {task ? "Edit Task" : "Create Task"}
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
-          value={task?.title || title}
+          value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:border-blue-500 p-2 rounded w-full text-gray-700"
           placeholder="Task Title"
           required
         />
         <textarea
-          value={task?.description || description}
+          value={description}
           onChange={(e) => setDescription(e.target.value)}
           className="border border-gray-300 focus:ring-2 focus:ring-blue-400 focus:border-blue-500 p-2 rounded w-full text-gray-700"
           placeholder="Task Description"
